@@ -29,6 +29,12 @@ pub fn create2_address(deployer_address: Address, salt: H256, init_code_hash: H2
     data[21..53].copy_from_slice(&salt.0);
     data[53..85].copy_from_slice(&init_code_hash.0);
 
-    let hash = keccak(&mut data);
+    let hash = keccak(data);
     Address::from_slice(&hash[12..])
+}
+
+/// Checks if an address fulfills vanity requirements
+pub fn fulfills_vanity(address: Address, prefix: &str) -> bool {
+    let address_hex = format!("{:x}", address);
+    address_hex.starts_with(prefix)
 }
