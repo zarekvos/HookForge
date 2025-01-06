@@ -1,40 +1,29 @@
-use ethereum_types::{Address, H256};
-use keccak_hash::keccak;
+use alloy_primitives::{address, Address, B256};
 use rand::Rng;
-use std::str::FromStr;
 
+/// Mine a salt that will result in a contract address with the desired hook permissions mask.
 pub fn mine_salt(
     deployer_address: Address,
-    init_code_hash: H256,
+    init_code_hash: B256,
     hook_permissions_mask: Address,
-) -> H256 {
-    let all_hook_mask: Address =
-        Address::from_str("0x0000000000000000000000000000000000003fff").unwrap();
+) -> B256 {
+    let all_hook_mask: Address = address!("0x0000000000000000000000000000000000003fff");
     loop {
-        let h256_bytes: [u8; 32] = rand::thread_rng().gen();
-        let salt = H256::from(h256_bytes);
-        let address = create2_address(deployer_address, salt, init_code_hash);
+        let salt = B256::from_slice(&rand::thread_rng().gen::<[u8; 32]>());
+        let address = deployer_address.create2(salt, init_code_hash);
         if hook_permissions_mask == address & all_hook_mask {
             return salt;
         }
     }
 }
 
-/// Compute the address of a contract created using the `CREATE2` opcode.
-/// address = keccak256(0xff + deployer_address_address + salt + keccak256(initialisation_code))[12:]
-pub fn create2_address(deployer_address: Address, salt: H256, init_code_hash: H256) -> Address {
-    let mut data = [0u8; 85];
-    data[0] = 0xff;
-    data[1..21].copy_from_slice(&deployer_address.0);
-    data[21..53].copy_from_slice(&salt.0);
-    data[53..85].copy_from_slice(&init_code_hash.0);
-
-    let hash = keccak(data);
-    Address::from_slice(&hash[12..])
-}
-
 /// Checks if an address fulfills vanity requirements
-pub fn fulfills_vanity(address: Address, prefix: &str) -> bool {
-    let address_hex = format!("{:x}", address);
-    address_hex.starts_with(prefix)
+pub fn fulfills_vanity(address: Address, prefix: &str, case_sensitive: bool) -> bool {
+    if !case_sensitive {
+        let address_str = format!("{:x}", address);
+        address_str.starts_with(&prefix.to_lowercase())
+    } else {
+        let address_str = &address.to_checksum(None)[2..];
+        address_str.starts_with(prefix)
+    }
 }
