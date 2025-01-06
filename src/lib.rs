@@ -19,11 +19,11 @@ pub fn mine_salt(
 
 /// Checks if an address fulfills vanity requirements
 pub fn fulfills_vanity(address: Address, prefix: &str, case_sensitive: bool) -> bool {
-    println!("Checking address: {:?}", address);
     if !case_sensitive {
-        let address_hex = format!("{:x}", address);
-        address_hex.starts_with(&prefix.to_lowercase())
+        let address_str = format!("{:x}", address);
+        address_str.starts_with(&prefix.to_lowercase())
     } else {
-        false
+        let address_str = &address.to_checksum(None)[2..];
+        address_str.starts_with(prefix)
     }
 }

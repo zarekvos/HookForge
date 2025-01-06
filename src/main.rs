@@ -110,9 +110,10 @@ fn main() {
     println!("\n\nSalt Found!");
     let salt = shared_salt.read().unwrap();
     println!(" * Salt: {:?}", salt);
-    // TODO: print address with case sensitivy checksum
     println!(
-        " * Address: {:?}",
-        deployer_address.create2(*salt, init_code_hash)
+        " * Address: {}",
+        deployer_address
+            .create2(*salt, init_code_hash)
+            .to_checksum(None)
     );
 }
