@@ -22,16 +22,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
-import { SquarePlus, SquareMinus , Copy} from "lucide-react";
+import { SquarePlus, SquareMinus, Copy, Check } from "lucide-react";
+import { CodeDisplay } from "@/components/code-display";
 
 const minerInputSchema = z.object({
   initCodeHash: z.string().length(66, {
     message: "Must be exactly 66 characters long including leading '0x'", // TODO: Try to display this error
   }),
   deployerAddress: z.string().length(42, {
-    message: "Must be exactly 42 characters long including leading '0x'",
+    message: "Must be exactly 42 characters long including leading '0x'", // TODO: Try to display this error
   }),
-  vanityPrefix: z.string().optional(), // TODO: Validate
+  vanityPrefix: z.string().optional(), // TODO: Validate if contains only hex
   caseSensitive: z.boolean().optional(),
   beforeInitialize: z.boolean(),
   afterInitialize: z.boolean(),
@@ -98,10 +99,11 @@ const hookPermissionsShort = {
   afterRemoveLiquidityReturnDelta: "afterRemoveLiquidityRD",
 };
 
-
 function App() {
   const [mining, setMining] = useState<boolean>(false);
   const [threads, setThreads] = useState<number>(2);
+  const [copiedSalt, setCopiedSalt] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
   const minerForm = useForm<z.infer<typeof minerInputSchema>>({
     resolver: zodResolver(minerInputSchema),
@@ -128,26 +130,32 @@ function App() {
   });
 
   function startMining(values: z.infer<typeof minerInputSchema>) {
-    // TODO: Start workers
+    // TODO: Start all workers
     console.log(values);
     setMining(true);
   }
 
   function stopMining() {
-    // TODO: Finalize workers
+    // TODO: Finalize all workers
     setMining(false);
   }
-  
-  async function copyToClipboard(text: string, valueCopied: string) {
-    await navigator.clipboard.writeText(text)
+
+  async function copyToClipboard(
+    text: string,
+    valueCopied: string,
+    setCopiedHook: (value: boolean) => void
+  ) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedHook(true);
+      setTimeout(() => setCopiedHook(false), 1500);
+    });
     //TODO: Add a toast notification
-    console.log(`Copied ${valueCopied} to clipboard: ${text}`) // TODO: Delete
-    
+    console.log(`Copied ${valueCopied} to clipboard: ${text}`); // TODO: Delete
   }
 
   return (
     <>
-      <div className=" text-pink-100 flex flex-col items-center lg:px-20 md:px-10 sm:px-5  pt-12 mt-12">
+      <div className=" text-pink-100 flex flex-col items-center lg:px-20 md:px-10 sm:px-5  pt-12 mt-12 mb-10">
         <Card className=" flex flex-col items-center w-full px-8 bg-black bg-opacity-80 border-pink-500">
           <h1 className=" text-4xl mt-8 font-semibold">
             Uniswap V4 Hook Address Miner Online Tool
@@ -155,7 +163,7 @@ function App() {
           <Form {...minerForm}>
             <form
               onSubmit={minerForm.handleSubmit(startMining)}
-              className="flex flex-col w-full center items-center gap-6 pt-6"
+              className="flex flex-col w-full center items-center"
             >
               <div className="flex flex-row w-full gap-8">
                 <div className=" text-justify w-1/2 flex flex-col gap-6">
@@ -268,44 +276,60 @@ function App() {
                 </div>
               </div>
               {/**Output Display */}
-              <div className="mt-4 p-4 rounded-lg border border-pink-500/20 bg-pink-500/5">
+              <div className="mt-6 p-4 rounded-lg border border-pink-500/20 bg-pink-500/5">
                 <Label className="text-sm font-medium text-pink-500">
-                  Generated Salt
+                  Salt Generated! / Run not started / Runing(with spinner) todo
                 </Label>
                 <div className="mt-2 flex items-center justify-between">
                   <code className="text-pink-50 font-mono text-sm ">
-                    Salt: 0x0000000000000000000000000000000000000000000000000000000000000000
+                    Salt:
+                    0x0000000000000000000000000000000000000000000000000000000000000000
                   </code>
                   <Button
                     type="button"
                     size="icon"
                     variant="ghost"
-                    onClick={() => copyToClipboard("TODO: Salt", "salt")}
-                    className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500"
+                    onClick={() =>
+                      copyToClipboard("TODO: Salt", "salt", setCopiedSalt)
+                    }
+                    className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
                   >
-                    <Copy className="h-4 w-4" />
+                    {copiedSalt ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
                     <span className="sr-only">Copy salt</span>
                   </Button>
                 </div>
                 <div className="mt-2 flex items-center justify-between">
                   <code className="text-pink-50 font-mono text-sm ">
-                    Address:  0xc0fFeE4847b379578588920ca78fbf26c0b4956c
+                    Address: 0xc0fFeE4847b379578588920ca78fbf26c0b4956c
                   </code>
                   <Button
                     type="button"
                     size="icon"
                     variant="ghost"
-                    onClick={() => copyToClipboard("TODO: Address", "address")}
-                    className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500"
+                    onClick={() =>
+                      copyToClipboard(
+                        "TODO: Address",
+                        "address",
+                        setCopiedAddress
+                      )
+                    }
+                    className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
                   >
-                    <Copy className="h-4 w-4" />
+                    {copiedAddress ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
                     <span className="sr-only">Copy address</span>
                   </Button>
                 </div>
-
               </div>
               {/** Control Buttons */}
-              <div className=" flex flex-row gap-6">
+              <div className=" flex flex-row gap-6 mt-6">
                 <Button
                   disabled={mining}
                   className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
@@ -344,12 +368,12 @@ function App() {
               </div>
             </form>
           </Form>
-          {/*<div className=" mx-5 h-96 bg-red-700">
-            TODO Add forge solidity code to copy paste and get the values
-          </div>*/}
-          <CardFooter>
-            <p>Build by Gianfranco TODO: Add link to twitter</p>
-          </CardFooter>
+          <CodeDisplay
+            language="solidity"
+            title="Foundry Script To Get Init Code Hash"
+            className=" w-full h-fit m-6 "
+            filePath="src/contracts/PrintInitCodeHash.s.sol"
+          />
         </Card>
       </div>
     </>
