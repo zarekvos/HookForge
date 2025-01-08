@@ -1,12 +1,5 @@
 import "./App.css";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -22,8 +15,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
-import { SquarePlus, SquareMinus, Copy, Check } from "lucide-react";
+import {
+  SquarePlus,
+  SquareMinus,
+  Copy,
+  Check,
+  LoaderPinwheel,
+  PartyPopper,
+} from "lucide-react";
 import { CodeDisplay } from "@/components/code-display";
+import { RandomCode } from "@/components/random-code";
 
 const minerInputSchema = z.object({
   initCodeHash: z.string().length(66, {
@@ -99,9 +100,24 @@ const hookPermissionsShort = {
   afterRemoveLiquidityReturnDelta: "afterRemoveLiquidityRD",
 };
 
+enum MiningStates {
+  NOT_STARTED,
+  RUNNING,
+  STOPPED,
+  FOUND,
+}
+
 function App() {
-  const [mining, setMining] = useState<boolean>(false);
+  const [miningState, setMiningState] = useState<MiningStates>(
+    MiningStates.NOT_STARTED
+  );
   const [threads, setThreads] = useState<number>(2);
+  const [resultSalt, setResultSalt] = useState<string>(
+    "0x229063f3bd4cc437d4415e5229ae68aeeab5322d76889185a0f267958867d544"
+  );
+  const [resultAddress, setResultAddress] = useState<string>(
+    "0xfB46D30c9b3AcC61d714d167179748fD01E09a36"
+  );
   const [copiedSalt, setCopiedSalt] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
 
@@ -132,25 +148,23 @@ function App() {
   function startMining(values: z.infer<typeof minerInputSchema>) {
     // TODO: Start all workers
     console.log(values);
-    setMining(true);
+    setMiningState(MiningStates.RUNNING);
   }
+  miningState;
 
   function stopMining() {
     // TODO: Finalize all workers
-    setMining(false);
+    setMiningState(MiningStates.STOPPED);
   }
 
   async function copyToClipboard(
     text: string,
-    valueCopied: string,
     setCopiedHook: (value: boolean) => void
   ) {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedHook(true);
       setTimeout(() => setCopiedHook(false), 1500);
     });
-    //TODO: Add a toast notification
-    console.log(`Copied ${valueCopied} to clipboard: ${text}`); // TODO: Delete
   }
 
   return (
@@ -278,20 +292,55 @@ function App() {
               {/**Output Display */}
               <div className="mt-6 p-4 rounded-lg border border-pink-500/20 bg-pink-500/5">
                 <Label className="text-sm font-medium text-pink-500">
-                  Salt Generated! / Run not started / Runing(with spinner) todo
+                  {
+                    {
+                      [MiningStates.NOT_STARTED]: (
+                        <span className=" flex flex-row justify-center h-6">
+                          Run Not Started
+                        </span>
+                      ),
+                      [MiningStates.RUNNING]: (
+                        <span className="flex flex-row justify-center gap-3 h-6">
+                          <LoaderPinwheel size={20} className="animate-spin" />
+                          Mining...
+                        </span>
+                      ),
+                      [MiningStates.STOPPED]: (
+                        <span className=" flex flex-row justify-center h-6">
+                          Mining Stopped
+                        </span>
+                      ),
+                      [MiningStates.FOUND]: (
+                        <span className=" flex flex-row justify-center gap-3  h-6">
+                          <PartyPopper size={20} />
+                          Salt Found!
+                        </span>
+                      ),
+                    }[miningState]
+                  }
                 </Label>
                 <div className="mt-2 flex items-center justify-between">
-                  <code className="text-pink-50 font-mono text-sm ">
-                    Salt:
-                    0x0000000000000000000000000000000000000000000000000000000000000000
-                  </code>
+                  <div className="flex flex-row items-center gap-1">
+                    <code className="text-sm ">Salt:</code>
+                    {(miningState == MiningStates.NOT_STARTED ||
+                      miningState == MiningStates.STOPPED) && (
+                      <code className="text-sm text-pink-50/25">
+                        {resultSalt}
+                      </code>
+                    )}
+                    {miningState == MiningStates.RUNNING && (
+                      <RandomCode className="text-sm text-pink-50" length={64} interval={35} />
+                    )}
+                    {miningState == MiningStates.FOUND && (
+                      <code className="text-sm text-pink-50">{resultSalt}</code>
+                    )}
+                  </div>
                   <Button
+                    disabled={MiningStates.FOUND != miningState}
                     type="button"
                     size="icon"
                     variant="ghost"
-                    onClick={() =>
-                      copyToClipboard("TODO: Salt", "salt", setCopiedSalt)
-                    }
+                    onClick={() => copyToClipboard(resultSalt, setCopiedSalt)}
                     className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
                   >
                     {copiedSalt ? (
@@ -303,19 +352,30 @@ function App() {
                   </Button>
                 </div>
                 <div className="mt-2 flex items-center justify-between">
-                  <code className="text-pink-50 font-mono text-sm ">
-                    Address: 0xc0fFeE4847b379578588920ca78fbf26c0b4956c
-                  </code>
+                  <div className="flex flex-row items-center gap-1">
+                    <code className="text-sm ">Address:</code>
+                    {(miningState == MiningStates.NOT_STARTED ||
+                      miningState == MiningStates.STOPPED) && (
+                      <code className="text-sm text-pink-50/25">
+                        {resultAddress}{/** TODO: The address shown here should change when we set the vanity and the permissions */}
+                      </code>
+                    )}
+                    {miningState == MiningStates.RUNNING && (
+                      <RandomCode className="text-sm text-pink-50" length={40} interval={35} />
+                    )}
+                    {miningState == MiningStates.FOUND && (
+                      <code className="text-sm text-pink-50">
+                        {resultAddress}
+                      </code>
+                    )}
+                  </div>
                   <Button
+                    disabled={MiningStates.FOUND != miningState}
                     type="button"
                     size="icon"
                     variant="ghost"
                     onClick={() =>
-                      copyToClipboard(
-                        "TODO: Address",
-                        "address",
-                        setCopiedAddress
-                      )
+                      copyToClipboard(resultAddress, setCopiedAddress)
                     }
                     className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
                   >
@@ -331,7 +391,7 @@ function App() {
               {/** Control Buttons */}
               <div className=" flex flex-row gap-6 mt-6">
                 <Button
-                  disabled={mining}
+                  disabled={miningState == MiningStates.RUNNING}
                   className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
                   type="submit"
                 >
@@ -339,7 +399,7 @@ function App() {
                 </Button>
                 <Button
                   type="button"
-                  disabled={!mining}
+                  disabled={miningState != MiningStates.RUNNING}
                   className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
                   onClick={stopMining}
                 >
@@ -351,7 +411,7 @@ function App() {
                     type="button"
                     disabled={threads == 1}
                     className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
-                    onClick={() => setThreads(threads - 1)} // TODO: Add a function that allows thread hot starting/stoping
+                    onClick={() => setThreads(threads - 1)} // TODO: Wrap setTreads into a function that allows thread hot starting/stoping
                   >
                     <SquareMinus />
                   </Button>
@@ -360,7 +420,7 @@ function App() {
                     type="button"
                     disabled={threads == 100} // TODO: set max threads
                     className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
-                    onClick={() => setThreads(threads + 1)} // TODO: Add a function that allows thread hot starting/stoping
+                    onClick={() => setThreads(threads + 1)} // TODO: Wrap setThreads into a function that allows thread hot starting/stoping
                   >
                     <SquarePlus />
                   </Button>
