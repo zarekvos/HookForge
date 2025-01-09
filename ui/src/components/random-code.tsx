@@ -34,5 +34,5 @@ export function RandomCode({ length, interval, className }: RandomCodeProps) {
   }, [length, interval]);
 
 
-  return <code className={className}>0x{randomString}</code>;
+  return <code className={className}>{randomString}</code>;
 }

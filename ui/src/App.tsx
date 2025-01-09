@@ -6,6 +6,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,12 +29,17 @@ import { RandomCode } from "@/components/random-code";
 
 const minerInputSchema = z.object({
   initCodeHash: z.string().length(66, {
-    message: "Must be exactly 66 characters long including leading '0x'", // TODO: Try to display this error
+    message: "Must be exactly 66 characters long including leading '0x'",
   }),
   deployerAddress: z.string().length(42, {
-    message: "Must be exactly 42 characters long including leading '0x'", // TODO: Try to display this error
+    message: "Must be exactly 42 characters long including leading '0x'",
   }),
-  vanityPrefix: z.string().optional(), // TODO: Validate if contains only hex
+  vanityPrefix: z
+    .string()
+    .regex(/^[0-9a-fA-F]*$/, {
+      message: "Must contain only hexadecimal characters",
+    })
+    .optional(),
   caseSensitive: z.boolean().optional(),
   beforeInitialize: z.boolean(),
   afterInitialize: z.boolean(),
@@ -50,6 +56,21 @@ const minerInputSchema = z.object({
   afterAddLiquidityReturnDelta: z.boolean(),
   afterRemoveLiquidityReturnDelta: z.boolean(),
 });
+
+const BEFORE_INITIALIZE_FLAG = 1 << 13;
+const AFTER_INITIALIZE_FLAG = 1 << 12;
+const BEFORE_ADD_LIQUIDITY_FLAG = 1 << 11;
+const AFTER_ADD_LIQUIDITY_FLAG = 1 << 10;
+const BEFORE_REMOVE_LIQUIDITY_FLAG = 1 << 9;
+const AFTER_REMOVE_LIQUIDITY_FLAG = 1 << 8;
+const BEFORE_SWAP_FLAG = 1 << 7;
+const AFTER_SWAP_FLAG = 1 << 6;
+const BEFORE_DONATE_FLAG = 1 << 5;
+const AFTER_DONATE_FLAG = 1 << 4;
+const BEFORE_SWAP_RETURNS_DELTA_FLAG = 1 << 3;
+const AFTER_SWAP_RETURNS_DELTA_FLAG = 1 << 2;
+const AFTER_ADD_LIQUIDITY_RETURNS_DELTA_FLAG = 1 << 1;
+const AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG = 1 << 0;
 
 const hookPermissions: [
   "beforeInitialize",
@@ -120,6 +141,8 @@ function App() {
   );
   const [copiedSalt, setCopiedSalt] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [hookPermissionsMask, setHookPermissionsMask] = useState<number>(0);
+  const [vanityPrefix, setVanityPrefix] = useState<string>("");
 
   const minerForm = useForm<z.infer<typeof minerInputSchema>>({
     resolver: zodResolver(minerInputSchema),
@@ -145,10 +168,66 @@ function App() {
     },
   });
 
+  function computeHookPermissionMaskAndSet(
+    values: z.infer<typeof minerInputSchema>
+  ) {
+    let _hookPermissionsMask: number = 0;
+    if (values.beforeInitialize) {
+      _hookPermissionsMask |= BEFORE_INITIALIZE_FLAG;
+    }
+    if (values.afterInitialize) {
+      _hookPermissionsMask |= AFTER_INITIALIZE_FLAG;
+    }
+    if (values.beforeAddLiquidity) {
+      _hookPermissionsMask |= BEFORE_ADD_LIQUIDITY_FLAG;
+    }
+    if (values.afterAddLiquidity) {
+      _hookPermissionsMask |= AFTER_ADD_LIQUIDITY_FLAG;
+    }
+    if (values.beforeRemoveLiquidity) {
+      _hookPermissionsMask |= BEFORE_REMOVE_LIQUIDITY_FLAG;
+    }
+    if (values.afterRemoveLiquidity) {
+      _hookPermissionsMask |= AFTER_REMOVE_LIQUIDITY_FLAG;
+    }
+    if (values.beforeSwap) {
+      _hookPermissionsMask |= BEFORE_SWAP_FLAG;
+    }
+    if (values.afterSwap) {
+      _hookPermissionsMask |= AFTER_SWAP_FLAG;
+    }
+    if (values.beforeDonate) {
+      _hookPermissionsMask |= BEFORE_DONATE_FLAG;
+    }
+    if (values.afterDonate) {
+      _hookPermissionsMask |= AFTER_DONATE_FLAG;
+    }
+    if (values.beforeSwapReturnDelta) {
+      _hookPermissionsMask |= BEFORE_SWAP_RETURNS_DELTA_FLAG;
+    }
+    if (values.afterSwapReturnDelta) {
+      _hookPermissionsMask |= AFTER_SWAP_RETURNS_DELTA_FLAG;
+    }
+    if (values.afterAddLiquidityReturnDelta) {
+      _hookPermissionsMask |= AFTER_ADD_LIQUIDITY_RETURNS_DELTA_FLAG;
+    }
+    if (values.afterRemoveLiquidityReturnDelta) {
+      _hookPermissionsMask |= AFTER_REMOVE_LIQUIDITY_RETURNS_DELTA_FLAG;
+    }
+    setHookPermissionsMask(_hookPermissionsMask);
+  }
+
   function startMining(values: z.infer<typeof minerInputSchema>) {
     // TODO: Start all workers
-    console.log(values);
     setMiningState(MiningStates.RUNNING);
+
+    // TODO: Once finish mining, set the result salt and address
+    return;
+    setResultSalt(
+      "0x229063f3bd4cc437d4415e5229ae68aeeab5322d76889185a0f267958867d544"
+    );
+    setResultAddress("0xfB46D30c9b3AcC61d714d167179748fD01E09a36");
+    setMiningState(MiningStates.FOUND);
   }
   miningState;
 
@@ -177,7 +256,7 @@ function App() {
           <Form {...minerForm}>
             <form
               onSubmit={minerForm.handleSubmit(startMining)}
-              className="flex flex-col w-full center items-center"
+              className="flex flex-col w-full center items-center mt-10"
             >
               <div className="flex flex-row w-full gap-8">
                 <div className=" text-justify w-1/2 flex flex-col gap-6">
@@ -185,7 +264,7 @@ function App() {
                   <FormField
                     control={minerForm.control}
                     name="initCodeHash"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>Init Code Hash</FormLabel>
                         <FormControl>
@@ -197,6 +276,9 @@ function App() {
                             {...field}
                           />
                         </FormControl>
+                        <FormMessage className="h-0 text-red-600/70 mt-1">
+                          {fieldState.error?.message}
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
@@ -204,7 +286,7 @@ function App() {
                   <FormField
                     control={minerForm.control}
                     name="deployerAddress"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>Deployer Address</FormLabel>
                         <FormControl>
@@ -216,6 +298,9 @@ function App() {
                             {...field}
                           />
                         </FormControl>
+                        <FormMessage className="h-0 text-red-600/70 mt-1">
+                          {fieldState.error?.message}
+                        </FormMessage>
                       </FormItem>
                     )}
                   />
@@ -226,8 +311,15 @@ function App() {
                       <FormField
                         control={minerForm.control}
                         name="vanityPrefix"
-                        render={({ field }) => (
-                          <FormItem className="flex w-full">
+                        render={({ field, fieldState }) => (
+                          <FormItem
+                            onChange={() => {
+                              setVanityPrefix(
+                                minerForm.getValues().vanityPrefix || ""
+                              );
+                            }}
+                            className="flex w-full flex-col"
+                          >
                             <FormControl>
                               <Input
                                 placeholder="Enter vanity prefix..."
@@ -237,6 +329,9 @@ function App() {
                                 {...field}
                               />
                             </FormControl>
+                            <FormMessage className="h-0 text-red-600/70 mt-1">
+                              {fieldState.error?.message}
+                            </FormMessage>
                           </FormItem>
                         )}
                       />
@@ -276,7 +371,12 @@ function App() {
                               <Checkbox
                                 className=" w-5  h-5 p-0 m-0 border-pink-500/50 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 hover:border-pink-500"
                                 checked={field.value}
-                                onCheckedChange={field.onChange}
+                                onCheckedChange={(values) => {
+                                  field.onChange(values);
+                                  computeHookPermissionMaskAndSet(
+                                    minerForm.getValues()
+                                  );
+                                }}
                               ></Checkbox>
                             </FormControl>
                             <FormLabel className="relative ">
@@ -324,12 +424,22 @@ function App() {
                     <code className="text-sm ">Salt:</code>
                     {(miningState == MiningStates.NOT_STARTED ||
                       miningState == MiningStates.STOPPED) && (
-                      <code className="text-sm text-pink-50/25">
-                        {resultSalt}
-                      </code>
+                      <span>
+                        <code className="text-sm text-pink-50">0x</code>
+                        <code className="text-sm text-pink-50/25">
+                          {resultSalt.slice(2, 66)}
+                        </code>
+                      </span>
                     )}
                     {miningState == MiningStates.RUNNING && (
-                      <RandomCode className="text-sm text-pink-50" length={64} interval={35} />
+                      <span>
+                        <code className="text-sm text-pink-50">0x</code>
+                        <RandomCode
+                          className="text-sm text-pink-50"
+                          length={64}
+                          interval={35}
+                        />
+                      </span>
                     )}
                     {miningState == MiningStates.FOUND && (
                       <code className="text-sm text-pink-50">{resultSalt}</code>
@@ -356,12 +466,40 @@ function App() {
                     <code className="text-sm ">Address:</code>
                     {(miningState == MiningStates.NOT_STARTED ||
                       miningState == MiningStates.STOPPED) && (
-                      <code className="text-sm text-pink-50/25">
-                        {resultAddress}{/** TODO: The address shown here should change when we set the vanity and the permissions */}
-                      </code>
+                      <span>
+                        <code className="text-sm text-pink-50">0x</code>
+                        <code className="text-sm text-pink-50">
+                          {vanityPrefix}
+                        </code>
+                        <code className="text-sm text-pink-50/25">
+                          {resultAddress.slice(2 + vanityPrefix.length, -3)}
+                        </code>
+                        <code className="text-sm text-pink-50">
+                          {hookPermissionsMask
+                            .toString(16)
+                            .padStart(3, "0")
+                            .slice(-3)}
+                        </code>
+                      </span>
                     )}
                     {miningState == MiningStates.RUNNING && (
-                      <RandomCode className="text-sm text-pink-50" length={40} interval={35} />
+                      <span>
+                        <code className="text-sm text-pink-50">0x</code>
+                        <code className="text-sm text-pink-50">
+                          {vanityPrefix}
+                        </code>
+                        <RandomCode
+                          className="text-sm text-pink-50"
+                          length={37 - vanityPrefix.length}
+                          interval={35}
+                        />
+                        <code className="text-sm text-pink-50">
+                          {hookPermissionsMask
+                            .toString(16)
+                            .padStart(3, "0")
+                            .slice(-3)}
+                        </code>
+                      </span>
                     )}
                     {miningState == MiningStates.FOUND && (
                       <code className="text-sm text-pink-50">

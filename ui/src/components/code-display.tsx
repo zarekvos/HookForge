@@ -22,7 +22,7 @@ export function CodeDisplay({ language, title, filePath, className}: CodeDisplay
   useEffect(() => {
     fetch(filePath)
       .then(response => response.text())
-      .then((text) => {setCode(text); console.log(text)})
+      .then((text) => {setCode(text)})
       .catch(error => console.error('Error loading Solidity file:', error));
   }, [filePath]);
 
