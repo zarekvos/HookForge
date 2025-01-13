@@ -270,7 +270,7 @@ function App() {
     worker.onmessage = (msg: MessageEvent<WorkerOutputs>) => {
       const outputs: WorkerOutputs = msg.data;
       if (outputs.workerState === WorkerState.INITIALIZED) {
-        /**1. Initialize wasm*/
+        /**1. Start  mining run*/
         worker.postMessage(inputs);
       } else if (outputs.workerState === WorkerState.MINED) {
         /**2. Handle miner outputs */
