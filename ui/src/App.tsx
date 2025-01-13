@@ -651,7 +651,7 @@ function App() {
             language="solidity"
             title="Foundry Script To Get Init Code Hash"
             className=" w-full h-fit m-6 "
-            filePath="src/contracts/PrintInitCodeHash.s.sol"
+            filePath="/PrintInitCodeHash.s.sol"
           />
         </Card>
       </div>
