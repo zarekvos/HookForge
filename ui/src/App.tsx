@@ -649,7 +649,7 @@ function App() {
           <CodeDisplay
             language="solidity"
             title="Foundry Script To Get Init Code Hash"
-            className=" w-full h-fit m-6 "
+            className=" w-full h-fit mt-6 mb-8 "
             filePath="/PrintInitCodeHash.s.sol"
           />
         </Card>
