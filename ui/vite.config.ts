@@ -5,8 +5,6 @@ import react from "@vitejs/plugin-react-swc";
 // https://vite.dev/config
 export default defineConfig({
   plugins: [react()],
-  worker: { format: "es" },
-  assetsInclude: [""],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -1,3 +1,4 @@
+import wasmUrl from "./miner_wasm_worker_bg.wasm?url"
 let wasm;
 
 function addToExternrefTable0(obj) {
@@ -420,7 +421,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('miner_wasm_worker_bg.wasm', import.meta.url);
+        module_or_path = wasmUrl
     }
     const imports = __wbg_get_imports();
 

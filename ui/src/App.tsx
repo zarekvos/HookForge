@@ -32,7 +32,7 @@ import type {
   WorkerOutputs,
 } from "./lib/miner_wasm_worker/worker.ts";
 import { WorkerState } from "./lib/miner_wasm_worker/worker.ts";
-// TODO: Specify function return types when missing, nit ts
+import minerWorker from  "./lib/miner_wasm_worker/worker.ts?worker";
 
 const minerInputSchema = z.object({
   initCodeHash: z
@@ -262,8 +262,7 @@ function App() {
   }, [miningState]);
 
   function startWorker(inputs: WorkerInputs): void {
-    const url = new URL("./lib/miner_wasm_worker/worker.ts", import.meta.url);
-    const worker = new Worker(url, { type: "module" });
+    const worker = new minerWorker();
 
     worker.postMessage({ initialize: true } as WorkerInputs);
 
