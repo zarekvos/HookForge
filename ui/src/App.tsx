@@ -32,7 +32,7 @@ import type {
   WorkerOutputs,
 } from "./lib/miner_wasm_worker/worker.ts";
 import { WorkerState } from "./lib/miner_wasm_worker/worker.ts";
-// TODO: Specify function return types when missing, nit ts
+import minerWorker from  "./lib/miner_wasm_worker/worker.ts?worker";
 
 const minerInputSchema = z.object({
   initCodeHash: z
@@ -262,15 +262,14 @@ function App() {
   }, [miningState]);
 
   function startWorker(inputs: WorkerInputs): void {
-    const url = new URL("./lib/miner_wasm_worker/worker.ts", import.meta.url);
-    const worker = new Worker(url, { type: "module" });
+    const worker = new minerWorker();
 
-    worker.postMessage({ initialize: true });
+    worker.postMessage({ initialize: true } as WorkerInputs);
 
     worker.onmessage = (msg: MessageEvent<WorkerOutputs>) => {
       const outputs: WorkerOutputs = msg.data;
       if (outputs.workerState === WorkerState.INITIALIZED) {
-        /**1. Initialize wasm*/
+        /**1. Start  mining run*/
         worker.postMessage(inputs);
       } else if (outputs.workerState === WorkerState.MINED) {
         /**2. Handle miner outputs */
@@ -651,7 +650,7 @@ function App() {
             language="solidity"
             title="Foundry Script To Get Init Code Hash"
             className=" w-full h-fit m-6 "
-            filePath="src/contracts/PrintInitCodeHash.s.sol"
+            filePath="/PrintInitCodeHash.s.sol"
           />
         </Card>
       </div>
