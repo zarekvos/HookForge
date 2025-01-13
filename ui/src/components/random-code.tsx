@@ -12,7 +12,7 @@ export function RandomCode({ length, interval, className }: RandomCodeProps) {
   // Helper function to generate a random string
   const generateRandomString = (length: number) => {
     const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      "0123456789abcdefABCDEF";
     let result = "";
     for (let i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
