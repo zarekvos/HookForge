@@ -634,9 +634,6 @@ function App() {
                   <div className="w-5">{threads}</div>
                   <Button
                     type="button"
-                    disabled={
-                      threads === window.navigator.hardwareConcurrency - 1
-                    }
                     className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
                     onClick={incrementThread}
                   >
