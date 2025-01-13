@@ -57,6 +57,6 @@ impl RunResult {
     }
 
     pub fn address(&self) -> String {
-        self.address.to_string()
+        self.address.to_checksum(None)
     }
 }

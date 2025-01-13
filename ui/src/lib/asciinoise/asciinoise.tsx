@@ -15,7 +15,7 @@ function AsciiNoise() {
   const SCALE = 8;
 
   function frameCounter() {
-    var frame = 0;
+    let frame = 0;
     return function () {
       return frame++;
     };
@@ -37,9 +37,9 @@ function AsciiNoise() {
   const [getWaveMap, setWaveMap] = initWaveMap([]);
 
   function generateRandomWaveMap(width: number, height: number) {
-    let _waveMap: number[][] = [];
+    const _waveMap: number[][] = [];
     for (let i = 0; i < width; i++) {
-      let row = [];
+      const row = [];
       for (let j = 0; j < height; j++) {
         const x = (i / width) * SCALE;
         const y = (j / height) * SCALE;
@@ -54,7 +54,7 @@ function AsciiNoise() {
 
   function evolveWaveMap(_waveMap: number[][]) {
     const frame = countFrame();
-    let evolvedWaveMap = _waveMap;
+    const evolvedWaveMap = _waveMap;
     _waveMap.forEach((row, i) => {
       row.forEach((_, j) => {
         const x = (i / _waveMap.length) * SCALE;

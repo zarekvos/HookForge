@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import {
   SquarePlus,
@@ -26,21 +26,38 @@ import {
 } from "lucide-react";
 import { CodeDisplay } from "@/components/code-display";
 import { RandomCode } from "@/components/random-code";
+import { numberToHex } from "viem";
+import type {
+  WorkerInputs,
+  WorkerOutputs,
+} from "./lib/miner_wasm_worker/worker.ts";
+import { WorkerState } from "./lib/miner_wasm_worker/worker.ts";
+// TODO: Specify function return types when missing, nit ts
 
 const minerInputSchema = z.object({
-  initCodeHash: z.string().length(66, {
-    message: "Must be exactly 66 characters long including leading '0x'",
-  }),
-  deployerAddress: z.string().length(42, {
-    message: "Must be exactly 42 characters long including leading '0x'",
-  }),
+  initCodeHash: z
+    .string()
+    .length(66, {
+      message: "Must be exactly 66 characters long including leading '0x'",
+    })
+    .regex(/^0x[0-9a-fA-F]*$/, {
+      message: "Must contain only hexadecimal characters",
+    }),
+  deployerAddress: z
+    .string()
+    .length(42, {
+      message: "Must be exactly 42 characters long including leading '0x'",
+    })
+    .regex(/^0x[0-9a-fA-F]*$/, {
+      message: "Must contain only hexadecimal characters",
+    }),
   vanityPrefix: z
     .string()
     .regex(/^[0-9a-fA-F]*$/, {
       message: "Must contain only hexadecimal characters",
     })
     .optional(),
-  caseSensitive: z.boolean().optional(),
+  caseSensitive: z.boolean().default(false),
   beforeInitialize: z.boolean(),
   afterInitialize: z.boolean(),
   beforeAddLiquidity: z.boolean(),
@@ -143,6 +160,7 @@ function App() {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [hookPermissionsMask, setHookPermissionsMask] = useState<number>(0);
   const [vanityPrefix, setVanityPrefix] = useState<string>("");
+  const [workers, setWorkers] = useState<Array<Worker>>([]);
 
   const minerForm = useForm<z.infer<typeof minerInputSchema>>({
     resolver: zodResolver(minerInputSchema),
@@ -168,9 +186,23 @@ function App() {
     },
   });
 
+  function fromFromValuesToWorkerInputs(
+    values: z.infer<typeof minerInputSchema>
+  ): WorkerInputs {
+    // Use "as `0x${string}`" carefully, as it skips TypeScript's type checking, here is safe since it is already enforced by form schema.
+    return {
+      initialize: false,
+      initCodeHash: values.initCodeHash as `0x${string}`,
+      deployerAddress: values.deployerAddress as `0x${string}`,
+      vanityPrefix: values.vanityPrefix as `0x${string}`,
+      caseSensitive: values.caseSensitive,
+      hookPermissionsMask: numberToHex(hookPermissionsMask, { size: 20 }),
+    };
+  }
+
   function computeHookPermissionMaskAndSet(
     values: z.infer<typeof minerInputSchema>
-  ) {
+  ): void {
     let _hookPermissionsMask: number = 0;
     if (values.beforeInitialize) {
       _hookPermissionsMask |= BEFORE_INITIALIZE_FLAG;
@@ -217,29 +249,70 @@ function App() {
     setHookPermissionsMask(_hookPermissionsMask);
   }
 
-  function startMining(values: z.infer<typeof minerInputSchema>) {
-    // TODO: Start all workers
-    setMiningState(MiningStates.RUNNING);
+  useEffect(() => {
+    if (
+      miningState === MiningStates.STOPPED ||
+      miningState === MiningStates.FOUND
+    ) {
+      for (let i = 0; i < workers.length; i++) {
+        workers[i].terminate();
+      }
+      setWorkers([]);
+    }
+  }, [miningState]);
 
-    // TODO: Once finish mining, set the result salt and address
-    return;
-    setResultSalt(
-      "0x229063f3bd4cc437d4415e5229ae68aeeab5322d76889185a0f267958867d544"
-    );
-    setResultAddress("0xfB46D30c9b3AcC61d714d167179748fD01E09a36");
-    setMiningState(MiningStates.FOUND);
+  function startWorker(inputs: WorkerInputs): void {
+    const url = new URL("./lib/miner_wasm_worker/worker.ts", import.meta.url);
+    const worker = new Worker(url, { type: "module" });
+
+    worker.postMessage({ initialize: true });
+
+    worker.onmessage = (msg: MessageEvent<WorkerOutputs>) => {
+      const outputs: WorkerOutputs = msg.data;
+      if (outputs.workerState === WorkerState.INITIALIZED) {
+        /**1. Initialize wasm*/
+        worker.postMessage(inputs);
+      } else if (outputs.workerState === WorkerState.MINED) {
+        /**2. Handle miner outputs */
+        setResultSalt(outputs.salt);
+        setResultAddress(outputs.address);
+        setMiningState(MiningStates.FOUND);
+      }
+    };
+
+    setWorkers((prevWorkers) => [...prevWorkers, worker]);
   }
-  miningState;
+
+  function startMining(values: z.infer<typeof minerInputSchema>): void {
+    for (let i = 0; i < threads; i++) {
+      startWorker(fromFromValuesToWorkerInputs(values));
+    }
+    setMiningState(MiningStates.RUNNING);
+  }
 
   function stopMining() {
-    // TODO: Finalize all workers
     setMiningState(MiningStates.STOPPED);
   }
 
-  async function copyToClipboard(
+  function incrementThread(): void {
+    setThreads((prevThreads) => prevThreads + 1);
+    if (miningState === MiningStates.RUNNING) {
+      startWorker(fromFromValuesToWorkerInputs(minerForm.getValues()));
+    }
+  }
+
+  function decrementThread(): void {
+    setThreads((prevThreads) => prevThreads - 1);
+    if (miningState === MiningStates.RUNNING) {
+      workers[workers.length - 1].terminate();
+      setWorkers((prevWorkers) => prevWorkers.slice(0, -1));
+    }
+  }
+
+  function copyToClipboard(
     text: string,
     setCopiedHook: (value: boolean) => void
-  ) {
+  ): void {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedHook(true);
       setTimeout(() => setCopiedHook(false), 1500);
@@ -269,14 +342,15 @@ function App() {
                         <FormLabel>Init Code Hash</FormLabel>
                         <FormControl>
                           <Input
+                            disabled={miningState === MiningStates.RUNNING}
                             placeholder="Enter init code hash..."
                             className="border-pink-500/50 bg-black text-pink-50 placeholder:text-pink-500/30 
                      focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
-                     transition-all duration-200"
+                     transition-all duration-200 mb-1"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="h-0 text-red-600/70 mt-1">
+                        <FormMessage className="h-0 text-red-600/70">
                           {fieldState.error?.message}
                         </FormMessage>
                       </FormItem>
@@ -291,14 +365,15 @@ function App() {
                         <FormLabel>Deployer Address</FormLabel>
                         <FormControl>
                           <Input
+                            disabled={miningState === MiningStates.RUNNING}
                             placeholder="Enter deployer address..."
                             className="border-pink-500/50 bg-black text-pink-50 placeholder:text-pink-500/30 
                      focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
-                     transition-all duration-200"
+                     transition-all duration-200 mb-1"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="h-0 text-red-600/70 mt-1">
+                        <FormMessage className="h-0 text-red-600/70">
                           {fieldState.error?.message}
                         </FormMessage>
                       </FormItem>
@@ -322,14 +397,16 @@ function App() {
                           >
                             <FormControl>
                               <Input
+                                disabled={miningState === MiningStates.RUNNING}
                                 placeholder="Enter vanity prefix..."
                                 className="flex border-pink-500/50 bg-black text-pink-50 placeholder:text-pink-500/30 
                      focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
-                     transition-all duration-200"
+                     transition-all duration-200 mb-1"
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage className="h-0 text-red-600/70 mt-1">
+
+                            <FormMessage className="h-0 text-red-600/70">
                               {fieldState.error?.message}
                             </FormMessage>
                           </FormItem>
@@ -342,6 +419,7 @@ function App() {
                           <FormItem className="flex flex-row items-center align-middle gap-2">
                             <FormControl>
                               <Checkbox
+                                disabled={miningState === MiningStates.RUNNING}
                                 className=" w-5  h-5 p-0 m-0 border-pink-500/50 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 hover:border-pink-500"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -359,7 +437,7 @@ function App() {
                 {/**Hook Permissions*/}
                 <div className=" text-justify  w-1/2">
                   <FormLabel>Hook Permissions</FormLabel>
-                  <div className="flex flex-col gap-2 lg:max-h-52 md:max-h-80 flex-wrap border rounded-md p-2 border-pink-500/50">
+                  <div className="flex flex-col gap-2 lg:max-h-60 md:max-h-80 flex-wrap border rounded-md p-3 border-pink-500/50">
                     {hookPermissions.map((permission) => (
                       <FormField
                         key={permission}
@@ -369,6 +447,7 @@ function App() {
                           <FormItem className="flex flex-row items-center align-middle gap-2">
                             <FormControl>
                               <Checkbox
+                                disabled={miningState === MiningStates.RUNNING}
                                 className=" w-5  h-5 p-0 m-0 border-pink-500/50 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 hover:border-pink-500"
                                 checked={field.value}
                                 onCheckedChange={(values) => {
@@ -422,8 +501,8 @@ function App() {
                 <div className="mt-2 flex items-center justify-between">
                   <div className="flex flex-row items-center gap-1">
                     <code className="text-sm ">Salt:</code>
-                    {(miningState == MiningStates.NOT_STARTED ||
-                      miningState == MiningStates.STOPPED) && (
+                    {(miningState === MiningStates.NOT_STARTED ||
+                      miningState === MiningStates.STOPPED) && (
                       <span>
                         <code className="text-sm text-pink-50">0x</code>
                         <code className="text-sm text-pink-50/25">
@@ -431,7 +510,7 @@ function App() {
                         </code>
                       </span>
                     )}
-                    {miningState == MiningStates.RUNNING && (
+                    {miningState === MiningStates.RUNNING && (
                       <span>
                         <code className="text-sm text-pink-50">0x</code>
                         <RandomCode
@@ -441,7 +520,7 @@ function App() {
                         />
                       </span>
                     )}
-                    {miningState == MiningStates.FOUND && (
+                    {miningState === MiningStates.FOUND && (
                       <code className="text-sm text-pink-50">{resultSalt}</code>
                     )}
                   </div>
@@ -464,8 +543,8 @@ function App() {
                 <div className="mt-2 flex items-center justify-between">
                   <div className="flex flex-row items-center gap-1">
                     <code className="text-sm ">Address:</code>
-                    {(miningState == MiningStates.NOT_STARTED ||
-                      miningState == MiningStates.STOPPED) && (
+                    {(miningState === MiningStates.NOT_STARTED ||
+                      miningState === MiningStates.STOPPED) && (
                       <span>
                         <code className="text-sm text-pink-50">0x</code>
                         <code className="text-sm text-pink-50">
@@ -482,7 +561,7 @@ function App() {
                         </code>
                       </span>
                     )}
-                    {miningState == MiningStates.RUNNING && (
+                    {miningState === MiningStates.RUNNING && (
                       <span>
                         <code className="text-sm text-pink-50">0x</code>
                         <code className="text-sm text-pink-50">
@@ -501,7 +580,7 @@ function App() {
                         </code>
                       </span>
                     )}
-                    {miningState == MiningStates.FOUND && (
+                    {miningState === MiningStates.FOUND && (
                       <code className="text-sm text-pink-50">
                         {resultAddress}
                       </code>
@@ -529,7 +608,7 @@ function App() {
               {/** Control Buttons */}
               <div className=" flex flex-row gap-6 mt-6">
                 <Button
-                  disabled={miningState == MiningStates.RUNNING}
+                  disabled={miningState === MiningStates.RUNNING}
                   className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
                   type="submit"
                 >
@@ -547,18 +626,20 @@ function App() {
                   Threads:
                   <Button
                     type="button"
-                    disabled={threads == 1}
+                    disabled={threads === 1}
                     className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
-                    onClick={() => setThreads(threads - 1)} // TODO: Wrap setTreads into a function that allows thread hot starting/stoping
+                    onClick={decrementThread}
                   >
                     <SquareMinus />
                   </Button>
                   <div className="w-5">{threads}</div>
                   <Button
                     type="button"
-                    disabled={threads == 100} // TODO: set max threads
+                    disabled={
+                      threads === window.navigator.hardwareConcurrency - 1
+                    }
                     className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
-                    onClick={() => setThreads(threads + 1)} // TODO: Wrap setThreads into a function that allows thread hot starting/stoping
+                    onClick={incrementThread}
                   >
                     <SquarePlus />
                   </Button>
