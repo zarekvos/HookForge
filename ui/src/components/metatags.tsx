@@ -26,7 +26,7 @@ export default function MetaTags() {
       />
       <meta
         property="og:image"
-        content="https://v4hookaddressminer.xyz/metatag.webp"
+        content="https://v4hookaddressminer.xyz/metatag.png"
       />
       <meta property="og:url" content="https://v4hookaddressminer.xyz/" />
       <meta property="og:type" content="website" />
@@ -40,7 +40,7 @@ export default function MetaTags() {
       />
       <meta
         name="twitter:image"
-        content="https://v4hookaddressminer.xyz/metatag.webp"
+        content="https://v4hookaddressminer.xyz/metatag.png"
       />
       <meta name="twitter:site" content="@bazzibazzani" />
       <meta name="twitter:creator" content="@bazzibazzani" />
