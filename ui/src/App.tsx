@@ -265,7 +265,7 @@ function App() {
     const url = new URL("./lib/miner_wasm_worker/worker.ts", import.meta.url);
     const worker = new Worker(url, { type: "module" });
 
-    worker.postMessage({ initialize: true });
+    worker.postMessage({ initialize: true } as WorkerInputs);
 
     worker.onmessage = (msg: MessageEvent<WorkerOutputs>) => {
       const outputs: WorkerOutputs = msg.data;
