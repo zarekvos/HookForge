@@ -32,7 +32,7 @@ import type {
   WorkerOutputs,
 } from "./lib/miner_wasm_worker/worker.ts";
 import { WorkerState } from "./lib/miner_wasm_worker/worker.ts";
-import minerWorker from  "./lib/miner_wasm_worker/worker.ts?worker";
+import minerWorker from "./lib/miner_wasm_worker/worker.ts?worker";
 
 const minerInputSchema = z.object({
   initCodeHash: z
@@ -326,15 +326,16 @@ function App() {
             Uniswap V4 Hook Address Miner
           </h1>
           <h2 className="text-lg mt-4 text-center">
-            Mine vanity Uniswap V4 hook addresses with our fast, easy-to-use, multithreaded online tool
+            Mine vanity Uniswap V4 hook addresses with our fast, easy-to-use,
+            multithreaded online tool
           </h2>
           <Form {...minerForm}>
             <form
               onSubmit={minerForm.handleSubmit(startMining)}
               className="flex flex-col w-full center items-center mt-10"
             >
-              <div className="flex flex-row w-full gap-8">
-                <div className=" text-justify w-1/2 flex flex-col gap-6">
+              <div className="flex flex-col md:flex-row w-full gap-8">
+                <div className=" text-justify w-full md:w-1/2 flex flex-col gap-6">
                   {/**initCodeHash */}
                   <FormField
                     control={minerForm.control}
@@ -437,7 +438,7 @@ function App() {
                   </div>
                 </div>
                 {/**Hook Permissions*/}
-                <div className=" text-justify  w-1/2">
+                <div className=" text-justify  w-full md:w-1/2">
                   <FormLabel>Hook Permissions</FormLabel>
                   <div className="flex flex-col gap-2 lg:max-h-60 md:max-h-80 flex-wrap border rounded-md p-3 border-pink-500/50">
                     {hookPermissions.map((permission) => (
@@ -471,7 +472,7 @@ function App() {
                 </div>
               </div>
               {/**Output Display */}
-              <div className="mt-6 p-4 rounded-lg border border-pink-500/20 bg-pink-500/5">
+              <div className="flex flex-col max-w-full mt-6 p-4 rounded-lg border border-pink-500/20 bg-pink-500/5">
                 <Label className="text-sm font-medium text-pink-500">
                   {
                     {
@@ -500,12 +501,12 @@ function App() {
                     }[miningState]
                   }
                 </Label>
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="flex flex-row items-center gap-1">
+                <div className="flex w-full mt-2 items-center justify-between">
+                  <div className="flex flex-row max-w-full items-center gap-1 truncate">
                     <code className="text-sm ">Salt:</code>
                     {(miningState === MiningStates.NOT_STARTED ||
                       miningState === MiningStates.STOPPED) && (
-                      <span>
+                      <span className="flex max-w-full">
                         <code className="text-sm text-pink-50">0x</code>
                         <code className="text-sm text-pink-50/25">
                           {resultSalt.slice(2, 66)}
@@ -542,12 +543,12 @@ function App() {
                     <span className="sr-only">Copy salt</span>
                   </Button>
                 </div>
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="flex flex-row items-center gap-1">
+                <div className="flex w-full mt-2 items-center justify-between">
+                  <div className="flex flex-row max-w-full items-center gap-1 truncate">
                     <code className="text-sm ">Address:</code>
                     {(miningState === MiningStates.NOT_STARTED ||
                       miningState === MiningStates.STOPPED) && (
-                      <span>
+                      <span className="flex max-w-full">
                         <code className="text-sm text-pink-50">0x</code>
                         <code className="text-sm text-pink-50">
                           {vanityPrefix}
@@ -608,22 +609,24 @@ function App() {
                 </div>
               </div>
               {/** Control Buttons */}
-              <div className=" flex flex-row gap-6 mt-6">
-                <Button
-                  disabled={miningState === MiningStates.RUNNING}
-                  className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
-                  type="submit"
-                >
-                  Mine!
-                </Button>
-                <Button
-                  type="button"
-                  disabled={miningState != MiningStates.RUNNING}
-                  className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
-                  onClick={stopMining}
-                >
-                  Stop
-                </Button>
+              <div className=" flex flex-col md:flex-row gap-6 mt-6">
+                <div className="flex flex-row gap-6 items-center">
+                  <Button
+                    disabled={miningState === MiningStates.RUNNING}
+                    className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
+                    type="submit"
+                  >
+                    Mine!
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={miningState != MiningStates.RUNNING}
+                    className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
+                    onClick={stopMining}
+                  >
+                    Stop
+                  </Button>
+                </div>
                 <div className="flex flex-row gap-2 items-center">
                   Threads:
                   <Button

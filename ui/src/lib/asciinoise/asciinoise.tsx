@@ -110,7 +110,7 @@ function AsciiNoise() {
     let _waveMap;
     // Initialize WaveMap (80% bigger to allow for resizing the canvas without regenerating the wave map)
     if (getWaveMap().length === 0) {
-      const width = Math.floor((window.innerWidth * 1.8) / CELL_SIZE);
+      const width = Math.floor((window.innerWidth * 2.5) / CELL_SIZE);
       const height = Math.floor((window.innerHeight * 1.8) / CELL_SIZE);
       _waveMap = generateRandomWaveMap(width, height);
       setWaveMap(_waveMap);
