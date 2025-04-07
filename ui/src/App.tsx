@@ -320,7 +320,7 @@ function App() {
 
   return (
     <>
-      <div className=" text-pink-100 flex flex-col items-center lg:px-20 md:px-10 sm:px-5  pt-12 mt-12 mb-10">
+      <div className=" text-pink-200 flex flex-col items-center lg:px-20 md:px-10 sm:px-5  pt-12 mt-12 mb-10">
         <Card className=" flex flex-col items-center w-full px-8 bg-black bg-opacity-80 border-pink-500">
           <h1 className=" text-4xl mt-8 font-semibold">
             Uniswap V4 Hook Address Miner
@@ -347,7 +347,7 @@ function App() {
                           <Input
                             disabled={miningState === MiningStates.RUNNING}
                             placeholder="Enter init code hash..."
-                            className="border-pink-500/50 bg-black text-pink-50 placeholder:text-pink-500/30 
+                            className="border-pink-500/50 bg-black text-pink-200 placeholder:text-pink-500/30 
                      focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
                      transition-all duration-200 mb-1"
                             {...field}
@@ -370,7 +370,7 @@ function App() {
                           <Input
                             disabled={miningState === MiningStates.RUNNING}
                             placeholder="Enter deployer address..."
-                            className="border-pink-500/50 bg-black text-pink-50 placeholder:text-pink-500/30 
+                            className="border-pink-500/50 bg-black text-pink-200 placeholder:text-pink-500/30 
                      focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
                      transition-all duration-200 mb-1"
                             {...field}
@@ -402,7 +402,7 @@ function App() {
                               <Input
                                 disabled={miningState === MiningStates.RUNNING}
                                 placeholder="Enter vanity prefix..."
-                                className="flex border-pink-500/50 bg-black text-pink-50 placeholder:text-pink-500/30 
+                                className="flex border-pink-500/50 bg-black text-pink-200 placeholder:text-pink-500/30 
                      focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
                      transition-all duration-200 mb-1"
                                 {...field}
@@ -507,24 +507,24 @@ function App() {
                     {(miningState === MiningStates.NOT_STARTED ||
                       miningState === MiningStates.STOPPED) && (
                       <span className="flex max-w-full">
-                        <code className="text-sm text-pink-50">0x</code>
-                        <code className="text-sm text-pink-50/25">
+                        <code className="text-sm text-pink-200">0x</code>
+                        <code className="text-sm text-pink-200/25">
                           {resultSalt.slice(2, 66)}
                         </code>
                       </span>
                     )}
                     {miningState === MiningStates.RUNNING && (
                       <span>
-                        <code className="text-sm text-pink-50">0x</code>
+                        <code className="text-sm text-pink-200">0x</code>
                         <RandomCode
-                          className="text-sm text-pink-50"
+                          className="text-sm text-pink-200"
                           length={64}
                           interval={35}
                         />
                       </span>
                     )}
                     {miningState === MiningStates.FOUND && (
-                      <code className="text-sm text-pink-50">{resultSalt}</code>
+                      <code className="text-sm text-pink-200">{resultSalt}</code>
                     )}
                   </div>
                   <Button
@@ -549,14 +549,14 @@ function App() {
                     {(miningState === MiningStates.NOT_STARTED ||
                       miningState === MiningStates.STOPPED) && (
                       <span className="flex max-w-full">
-                        <code className="text-sm text-pink-50">0x</code>
-                        <code className="text-sm text-pink-50">
+                        <code className="text-sm text-pink-200">0x</code>
+                        <code className="text-sm text-pink-200">
                           {vanityPrefix}
                         </code>
-                        <code className="text-sm text-pink-50/25">
+                        <code className="text-sm text-pink-200/25">
                           {resultAddress.slice(2 + vanityPrefix.length, -3)}
                         </code>
-                        <code className="text-sm text-pink-50">
+                        <code className="text-sm text-pink-200">
                           {hookPermissionsMask
                             .toString(16)
                             .padStart(3, "0")
@@ -566,16 +566,16 @@ function App() {
                     )}
                     {miningState === MiningStates.RUNNING && (
                       <span>
-                        <code className="text-sm text-pink-50">0x</code>
-                        <code className="text-sm text-pink-50">
+                        <code className="text-sm text-pink-200">0x</code>
+                        <code className="text-sm text-pink-200">
                           {vanityPrefix}
                         </code>
                         <RandomCode
-                          className="text-sm text-pink-50"
+                          className="text-sm text-pink-200"
                           length={37 - vanityPrefix.length}
                           interval={35}
                         />
-                        <code className="text-sm text-pink-50">
+                        <code className="text-sm text-pink-200">
                           {hookPermissionsMask
                             .toString(16)
                             .padStart(3, "0")
@@ -584,7 +584,7 @@ function App() {
                       </span>
                     )}
                     {miningState === MiningStates.FOUND && (
-                      <code className="text-sm text-pink-50">
+                      <code className="text-sm text-pink-200">
                         {resultAddress}
                       </code>
                     )}
