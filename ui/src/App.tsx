@@ -53,6 +53,7 @@ const minerInputSchema = z.object({
     }),
   vanityPrefix: z
     .string()
+    .max(36, { message: "Max length is 36 characters" })
     .regex(/^[0-9a-fA-F]*$/, {
       message: "Must contain only hexadecimal characters",
     })
@@ -132,10 +133,10 @@ const hookPermissionsShort = {
   afterSwap: "afterSwap",
   beforeDonate: "beforeDonate",
   afterDonate: "afterDonate",
-  beforeSwapReturnDelta: "beforeSwapRD",
-  afterSwapReturnDelta: "afterSwapRD",
-  afterAddLiquidityReturnDelta: "afterAddLiquidityRD",
-  afterRemoveLiquidityReturnDelta: "afterRemoveLiquidityRD",
+  beforeSwapReturnDelta: "beforeSwapReturnDelta",
+  afterSwapReturnDelta: "afterSwapReturnDelta",
+  afterAddLiquidityReturnDelta: "afterAddLiquidityReturnDelta",
+  afterRemoveLiquidityReturnDelta: "afterRemoveLiquidityReturnDelta",
 };
 
 enum MiningStates {
@@ -393,7 +394,7 @@ function App() {
                           <FormItem
                             onChange={() => {
                               setVanityPrefix(
-                                minerForm.getValues().vanityPrefix || ""
+                                (minerForm.getValues().vanityPrefix || "").slice(0, 36)
                               );
                             }}
                             className="flex w-full flex-col"
