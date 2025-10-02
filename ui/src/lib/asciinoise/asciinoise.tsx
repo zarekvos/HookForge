@@ -10,7 +10,7 @@ function AsciiNoise() {
   const noise = new Perlin(seed);
   const CHAR = "            ·@#xo0$;:'-+,._        ";
   const CELL_SIZE = 12;
-  const COLOR = "#f50fb3";
+  const COLOR = "#3b82f6";
   const FRAME_TIME = 1000 / 60;
   const SCALE = 8;
 

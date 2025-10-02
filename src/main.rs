@@ -6,7 +6,7 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use uni_v4_hook_address_miner::{fulfills_vanity, mine_salt};
 
-const CREATE2_UNIVERSAL_DEPLOYER: &str = "0x4e59b44847b379578588920ca78fbf26c0b4956c";
+const CREATE2_UNIVERSAL_DEPLOYER: &str = "0x3F06E9124da279d95942E0B3ddc8aF43948987f0";
 
 #[derive(Parser)]
 #[command(about, long_about = None)]

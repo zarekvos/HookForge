@@ -167,7 +167,7 @@ function App() {
     resolver: zodResolver(minerInputSchema),
     defaultValues: {
       initCodeHash: "",
-      deployerAddress: "0x4e59b44847b379578588920ca78fbf26c0b4956c",
+      deployerAddress: "0x3F06E9124da279d95942E0B3ddc8aF43948987f0",
       vanityPrefix: "",
       caseSensitive: false,
       beforeInitialize: false,
@@ -321,10 +321,10 @@ function App() {
 
   return (
     <>
-      <div className=" text-pink-200 flex flex-col items-center lg:px-20 md:px-10 sm:px-5  pt-12 mt-12 mb-10">
-        <Card className=" flex flex-col items-center w-full px-8 bg-black bg-opacity-80 border-pink-500">
+      <div className=" text-blue-200 flex flex-col items-center lg:px-20 md:px-10 sm:px-5  pt-12 mt-12 mb-10">
+        <Card className=" flex flex-col items-center w-full px-8 bg-black bg-opacity-80 border-blue-500">
           <h1 className=" text-4xl mt-8 font-semibold">
-            Uniswap V4 Hook Address Miner
+            HookForge Miner
           </h1>
           <h2 className="text-lg mt-4 text-center">
             Mine vanity Uniswap V4 hook addresses with our fast, easy-to-use,
@@ -348,8 +348,8 @@ function App() {
                           <Input
                             disabled={miningState === MiningStates.RUNNING}
                             placeholder="Enter init code hash..."
-                            className="border-pink-500/50 bg-black text-pink-200 placeholder:text-pink-500/30 
-                     focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
+                            className="border-blue-500/50 bg-black text-blue-200 placeholder:text-blue-500/30 
+                     focus:border-blue-500 focus:ring-blue-500/50 hover:border-blue-500/40 
                      transition-all duration-200 mb-1"
                             {...field}
                           />
@@ -371,8 +371,8 @@ function App() {
                           <Input
                             disabled={miningState === MiningStates.RUNNING}
                             placeholder="Enter deployer address..."
-                            className="border-pink-500/50 bg-black text-pink-200 placeholder:text-pink-500/30 
-                     focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
+                            className="border-blue-500/50 bg-black text-blue-200 placeholder:text-blue-500/30 
+                     focus:border-blue-500 focus:ring-blue-500/50 hover:border-blue-500/40 
                      transition-all duration-200 mb-1"
                             {...field}
                           />
@@ -403,8 +403,8 @@ function App() {
                               <Input
                                 disabled={miningState === MiningStates.RUNNING}
                                 placeholder="Enter vanity prefix..."
-                                className="flex border-pink-500/50 bg-black text-pink-200 placeholder:text-pink-500/30 
-                     focus:border-pink-500 focus:ring-pink-500/50 hover:border-pink-500/40 
+                                className="flex border-blue-500/50 bg-black text-blue-200 placeholder:text-blue-500/30 
+                     focus:border-blue-500 focus:ring-blue-500/50 hover:border-blue-500/40 
                      transition-all duration-200 mb-1"
                                 {...field}
                               />
@@ -424,7 +424,7 @@ function App() {
                             <FormControl>
                               <Checkbox
                                 disabled={miningState === MiningStates.RUNNING}
-                                className=" w-5  h-5 p-0 m-0 border-pink-500/50 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 hover:border-pink-500"
+                                className=" w-5  h-5 p-0 m-0 border-blue-500/50 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 hover:border-blue-500"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               ></Checkbox>
@@ -441,7 +441,7 @@ function App() {
                 {/**Hook Permissions*/}
                 <div className=" text-justify  w-full md:w-1/2">
                   <FormLabel>Hook Permissions</FormLabel>
-                  <div className="flex flex-col gap-2 lg:max-h-60 md:max-h-80 flex-wrap border rounded-md p-3 border-pink-500/50">
+                  <div className="flex flex-col gap-2 lg:max-h-60 md:max-h-80 flex-wrap border rounded-md p-3 border-blue-500/50">
                     {hookPermissions.map((permission) => (
                       <FormField
                         key={permission}
@@ -452,7 +452,7 @@ function App() {
                             <FormControl>
                               <Checkbox
                                 disabled={miningState === MiningStates.RUNNING}
-                                className=" w-5  h-5 p-0 m-0 border-pink-500/50 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 hover:border-pink-500"
+                                className=" w-5  h-5 p-0 m-0 border-blue-500/50 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 hover:border-blue-500"
                                 checked={field.value}
                                 onCheckedChange={(values) => {
                                   field.onChange(values);
@@ -473,8 +473,8 @@ function App() {
                 </div>
               </div>
               {/**Output Display */}
-              <div className="flex flex-col max-w-full mt-6 p-4 rounded-lg border border-pink-500/20 bg-pink-500/5">
-                <Label className="text-sm font-medium text-pink-500">
+              <div className="flex flex-col max-w-full mt-6 p-4 rounded-lg border border-blue-500/20 bg-blue-500/5">
+                <Label className="text-sm font-medium text-blue-500">
                   {
                     {
                       [MiningStates.NOT_STARTED]: (
@@ -508,24 +508,24 @@ function App() {
                     {(miningState === MiningStates.NOT_STARTED ||
                       miningState === MiningStates.STOPPED) && (
                       <span className="flex max-w-full">
-                        <code className="text-sm text-pink-200">0x</code>
-                        <code className="text-sm text-pink-200/25">
+                        <code className="text-sm text-blue-200">0x</code>
+                        <code className="text-sm text-blue-200/25">
                           {resultSalt.slice(2, 66)}
                         </code>
                       </span>
                     )}
                     {miningState === MiningStates.RUNNING && (
                       <span>
-                        <code className="text-sm text-pink-200">0x</code>
+                        <code className="text-sm text-blue-200">0x</code>
                         <RandomCode
-                          className="text-sm text-pink-200"
+                          className="text-sm text-blue-200"
                           length={64}
                           interval={35}
                         />
                       </span>
                     )}
                     {miningState === MiningStates.FOUND && (
-                      <code className="text-sm text-pink-200">{resultSalt}</code>
+                      <code className="text-sm text-blue-200">{resultSalt}</code>
                     )}
                   </div>
                   <Button
@@ -534,7 +534,7 @@ function App() {
                     size="icon"
                     variant="ghost"
                     onClick={() => copyToClipboard(resultSalt, setCopiedSalt)}
-                    className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
+                    className="ml-4 h-8 w-8 text-blue-500 hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500 duration-200"
                   >
                     {copiedSalt ? (
                       <Check className="w-4 h-4" />
@@ -550,14 +550,14 @@ function App() {
                     {(miningState === MiningStates.NOT_STARTED ||
                       miningState === MiningStates.STOPPED) && (
                       <span className="flex max-w-full">
-                        <code className="text-sm text-pink-200">0x</code>
-                        <code className="text-sm text-pink-200">
+                        <code className="text-sm text-blue-200">0x</code>
+                        <code className="text-sm text-blue-200">
                           {vanityPrefix}
                         </code>
-                        <code className="text-sm text-pink-200/25">
+                        <code className="text-sm text-blue-200/25">
                           {resultAddress.slice(2 + vanityPrefix.length, -3)}
                         </code>
-                        <code className="text-sm text-pink-200">
+                        <code className="text-sm text-blue-200">
                           {hookPermissionsMask
                             .toString(16)
                             .padStart(3, "0")
@@ -567,16 +567,16 @@ function App() {
                     )}
                     {miningState === MiningStates.RUNNING && (
                       <span>
-                        <code className="text-sm text-pink-200">0x</code>
-                        <code className="text-sm text-pink-200">
+                        <code className="text-sm text-blue-200">0x</code>
+                        <code className="text-sm text-blue-200">
                           {vanityPrefix}
                         </code>
                         <RandomCode
-                          className="text-sm text-pink-200"
+                          className="text-sm text-blue-200"
                           length={37 - vanityPrefix.length}
                           interval={35}
                         />
-                        <code className="text-sm text-pink-200">
+                        <code className="text-sm text-blue-200">
                           {hookPermissionsMask
                             .toString(16)
                             .padStart(3, "0")
@@ -585,7 +585,7 @@ function App() {
                       </span>
                     )}
                     {miningState === MiningStates.FOUND && (
-                      <code className="text-sm text-pink-200">
+                      <code className="text-sm text-blue-200">
                         {resultAddress}
                       </code>
                     )}
@@ -598,7 +598,7 @@ function App() {
                     onClick={() =>
                       copyToClipboard(resultAddress, setCopiedAddress)
                     }
-                    className="ml-4 h-8 w-8 text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
+                    className="ml-4 h-8 w-8 text-blue-500 hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500 duration-200"
                   >
                     {copiedAddress ? (
                       <Check className="w-4 h-4" />
@@ -614,7 +614,7 @@ function App() {
                 <div className="flex flex-row gap-6 items-center">
                   <Button
                     disabled={miningState === MiningStates.RUNNING}
-                    className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
+                    className=" w-24 bg-black border-blue-500/50 hover:border-blue-500"
                     type="submit"
                   >
                     Mine!
@@ -622,7 +622,7 @@ function App() {
                   <Button
                     type="button"
                     disabled={miningState != MiningStates.RUNNING}
-                    className=" w-24 bg-black border-pink-500/50 hover:border-pink-500"
+                    className=" w-24 bg-black border-blue-500/50 hover:border-blue-500"
                     onClick={stopMining}
                   >
                     Stop
@@ -633,7 +633,7 @@ function App() {
                   <Button
                     type="button"
                     disabled={threads === 1}
-                    className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
+                    className=" w-fill px-3 bg-black border-blue-500/50 hover:border-blue-500"
                     onClick={decrementThread}
                   >
                     <SquareMinus />
@@ -641,7 +641,7 @@ function App() {
                   <div className="w-5">{threads}</div>
                   <Button
                     type="button"
-                    className=" w-fill px-3 bg-black border-pink-500/50 hover:border-pink-500"
+                    className=" w-fill px-3 bg-black border-blue-500/50 hover:border-blue-500"
                     onClick={incrementThread}
                   >
                     <SquarePlus />

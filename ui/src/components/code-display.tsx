@@ -34,14 +34,14 @@ export function CodeDisplay({ language, title, filePath, className}: CodeDisplay
   };
 
   return (
-    <Card className={cn(" bg-black border-pink-500/50 overflow-hidden", className)}>
-      <div className="flex justify-between items-center px-4 py-2 bg-zinc-900/70 border-b border-pink-900/20">
+    <Card className={cn(" bg-black border-blue-500/50 overflow-hidden", className)}>
+      <div className="flex justify-between items-center px-4 py-2 bg-zinc-900/70 border-b border-blue-900/20">
         <h3 className=" font-medium">{title}</h3>
         <Button
           onClick={copyToClipboard}
           variant="ghost"
           size="sm"
-          className="text-pink-500 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500 duration-200"
+          className="text-blue-500 hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500 duration-200"
         >
           {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
           {copied ? 'Copied!' : 'Copy'}

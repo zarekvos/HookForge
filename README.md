@@ -24,7 +24,7 @@ Arguments:
   [HOOK_PERMISSIONS_MASK]  
 
 Options:
-  -d, --deployer-address <DEPLOYER_ADDRESS>  [default: 0x4e59b44847b379578588920ca78fbf26c0b4956c]
+  -d, --deployer-address <DEPLOYER_ADDRESS>  [default: 0x3F06E9124da279d95942E0B3ddc8aF43948987f0]
   -t, --threads <NUMBER_OF_THREADS>          [default: 8]
   -p, --vanity-prefix <VANITY_PREFIX>        
   -c, --case-sensitive                       
@@ -37,7 +37,7 @@ Options:
 ```
 ```shell
 Run properties:
- * Deployer address: 0x4e59b44847b379578588920ca78fbf26c0b4956c
+ * Deployer address: 0x3F06E9124da279d95942E0B3ddc8aF43948987f0
  * Init code hash: 0x229063f3bd4cc437d4415e5229ae68aeeab5322d76889185a0f267958867d544
  * Hook permissions mask: 0x0000000000000000000000000000000000000003
  * Vanity prefix: "0dd"

@@ -1,5 +1,5 @@
 [package]
-name = "uni-v4-hook-address-miner"
+name = "hookforge-miner"
 version = "0.1.0"
 edition = "2021"
 
