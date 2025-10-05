@@ -1,8 +1,9 @@
 {
-  "buildCommand": "cd ui && npm install && npm run build",
+  "buildCommand": "cd ui && npm ci && npm run build",
   "outputDirectory": "ui/dist",
   "installCommand": "echo 'Skipping root install'",
   "framework": "vite",
+  "nodejs": 18,
   "rewrites": [
     {
       "source": "/(.*)",
