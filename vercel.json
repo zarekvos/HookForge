@@ -1,5 +1,0 @@
-﻿{
-  "buildCommand": "npm run vercel-build",
-  "outputDirectory": "ui/dist",
-  "installCommand": "npm ci || npm install"
-}
