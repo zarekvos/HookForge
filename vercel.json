@@ -1,4 +1,4 @@
 ﻿{
-  "outputDirectory": "ui/dist",
-  "buildCommand": "npm run vercel-build"
+  "buildCommand": "npm --prefix ui install && npm --prefix ui run build",
+  "outputDirectory": "ui/dist"
 }
