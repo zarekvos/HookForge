@@ -1,51 +1,35 @@
-# uni-v4-hook-address-miner
+# HookForge
 
-Multithread Vanity Address Miner for Uniswap V4 Hooks
+Professional-grade Uniswap V4 Hook Address Miner. Craft deterministic hook contracts with precision, speed, and full control over your on-chain identity.
 
-## Online version
+## ⚡ Features
 
-You can use the tool through a fancy UI in [v4hookaddressminer.xyz](https://v4hookaddressminer.xyz/)
+- **Vanity Address Mining**: Generate hooks with personalized prefixes using efficient salt mining algorithms
+- **Parallel Performance**: Optimized multithreaded engine with 8+ threads for maximum mining speed
+- **Configurable Parameters**: Full control over deployer address, init code hash, and permission masks
+- **Dual Interface**: Professional web UI and powerful CLI for advanced developers
+- **Open Source**: Built with Rust + TypeScript + Solidity for the Uniswap V4 ecosystem
 
-## Cli version
+## 🚀 Quick Start
 
-1. Download the latest release for your system from [GitHub Releases](https://github.com/GianfrancoBazzani/uni-v4-hook-address-miner/releases).
-2. Uncompress the downloaded binary.
-3. Run the binary `uni-v4-hook-address-miner`.
+### Web Interface
+Visit the online tool for an intuitive mining experience with real-time feedback.
 
-### Help 
-```shell
-❯ ./uni-v4-hook-address-miner --help
-```
-```shell
-Usage: uni-v4-hook-address-miner [OPTIONS] [INIT_CODE_HASH] [HOOK_PERMISSIONS_MASK]
+### CLI Usage
+```bash
+# Basic mining with custom prefix
+./hookforge-cli -t 8 -p 0x00 [INIT_CODE_HASH] [HOOK_PERMISSIONS_MASK]
 
-Arguments:
-  [INIT_CODE_HASH]         
-  [HOOK_PERMISSIONS_MASK]  
-
-Options:
-  -d, --deployer-address <DEPLOYER_ADDRESS>  [default: 0x3F06E9124da279d95942E0B3ddc8aF43948987f0]
-  -t, --threads <NUMBER_OF_THREADS>          [default: 8]
-  -p, --vanity-prefix <VANITY_PREFIX>        
-  -c, --case-sensitive                       
-  -h, --help                                 Print help
+# Advanced configuration
+./hookforge-cli -d 0x3F06E9124da279d95942E0B3ddc8aF43948987f0 -t 16 -p cafe -c [INIT_CODE_HASH] [PERMISSIONS]
 ```
 
-### Example Usage
-```shell
-❯ ./uni-v4-hook-address-miner -t 10 -p 0dd -c 0x229063f3bd4cc437d4415e5229ae68aeeab5322d76889185a0f267958867d544 0x0000000000000000000000000000000000000003
-```
-```shell
-Run properties:
- * Deployer address: 0x3F06E9124da279d95942E0B3ddc8aF43948987f0
- * Init code hash: 0x229063f3bd4cc437d4415e5229ae68aeeab5322d76889185a0f267958867d544
- * Hook permissions mask: 0x0000000000000000000000000000000000000003
- * Vanity prefix: "0dd"
- * Number of threads: 10
+## 🛠 Development
 
-▰▰▱▱▱▱▱ Mining...
+Built for Uniswap V4 Builders. Powered by Base.
 
-Salt Found!
- * Salt: 0x997c9dca16e43c434b99cd75a8daffd02c02315d227f28e504048ff340074012
- * Address: 0x0dde6775Ae6b503267B6ded53897526b3c760003
-```
+**"Forge your perfect hook. Deterministically."**
+
+---
+
+Made by [Zarekvos](https://github.com/zarekvos)
