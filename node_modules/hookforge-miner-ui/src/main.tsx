@@ -24,7 +24,7 @@ function App() {
   };
 
   if (currentPath === '/app') {
-    return <AppPage />;
+    return <AppPage navigate={navigate} />;
   }
 
   return (

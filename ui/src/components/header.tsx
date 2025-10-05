@@ -1,4 +1,4 @@
-import { Github } from "lucide-react";
+import { Github, Link } from "lucide-react";
 
 // Custom X (Twitter) Logo Component
 const XLogo = ({ size = 21, className = "" }) => (
@@ -15,12 +15,12 @@ const XLogo = ({ size = 21, className = "" }) => (
 
 export function Header() {
   return (
-    <header className=" fixed w-full z-50 bg-opacity-80 backdrop-blur-sm bg-black text-primary-foreground border-b shadow border-blue-500">
+    <header className=" fixed w-full z-50 bg-black/20 backdrop-blur-md border-b border-white/10 text-primary-foreground">
       <div className=" px-20 py-3 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 ml-24">
           <h1 className="text-xl font-bold text-blue-200">HookForge</h1>
-          <span className="text-xl" role="img" aria-label="Hook">
-            ⚡
+          <span className="text-xl text-blue-200" role="img" aria-label="Chain">
+            <Link size={20} />
           </span>
           <h1 className="text-xl font-bold text-blue-200">Miner</h1>
         </div>

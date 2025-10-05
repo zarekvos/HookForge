@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Github } from 'lucide-react';
+import FiksFinalLogo from '../assets/fiksfinal.png';
 
 // Custom X Logo Component
 const XLogo = ({ size = 20, className = "" }) => (
@@ -14,6 +15,8 @@ const XLogo = ({ size = 20, className = "" }) => (
   </svg>
 );
 
+
+
 interface NavbarProps {
   navigate: (path: string) => void;
 }
@@ -24,16 +27,18 @@ const Navbar = ({ navigate }: NavbarProps) => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-md border-b border-white/10"
+      className="fixed top-0 w-full z-50 bg-transparent backdrop-blur-none border-none"
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <button onClick={() => navigate('/')} className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">H</span>
-            </div>
-            <span className="text-white font-bold text-xl">HookForge</span>
+          <button onClick={() => navigate('/')} className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-black/20 backdrop-blur-sm border border-white/10 text-blue-400 hover:text-blue-300 hover:bg-black/30 transition-all duration-300 font-diatype font-semibold tracking-wide">
+            <img 
+              src={FiksFinalLogo} 
+              alt="HookForge Logo" 
+              className="w-6 h-6 rounded-md"
+            />
+            <span>HookForge</span>
           </button>
 
           {/* Social Links */}
@@ -56,12 +61,19 @@ const Navbar = ({ navigate }: NavbarProps) => {
               <Github size={20} />
               <span className="sr-only">GitHub</span>
             </a>
-            <button
+            <motion.button
               onClick={() => navigate('/app')}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300"
+              className="px-4 py-2 rounded-lg bg-black/20 backdrop-blur-sm border border-white/10 text-blue-400 hover:text-blue-300 hover:bg-black/30 transition-all duration-300 font-diatype font-semibold tracking-wide"
+              whileHover={{ 
+                scale: 1.05, 
+                y: -2,
+                boxShadow: "0 10px 25px rgba(59, 130, 246, 0.3)"
+              }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 600, damping: 15, duration: 0.2 }}
             >
               Launch App
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
