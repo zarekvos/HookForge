@@ -1,6 +1,9 @@
 {
   "name": "hookforge-monorepo",
   "version": "1.0.0",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "build": "cd ui && npm install && npm run build",
     "dev": "cd ui && npm run dev"
