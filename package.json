@@ -5,7 +5,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "build": "cd ui && npm install && npm run build",
+    "build": "echo 'Build handled by Vercel'",
     "dev": "cd ui && npm run dev"
   },
   "workspaces": ["ui"]
