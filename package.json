@@ -6,7 +6,7 @@
   },
   "scripts": {
     "build": "npm --prefix ui install && npm --prefix ui run build",
-    "vercel-build": "npm --prefix ui install && npm --prefix ui run build",
+    "vercel-build": "npm --prefix ui install && npm --prefix ui run build", 
     "dev": "cd ui && npm run dev"
   },
   "dependencies": {},
