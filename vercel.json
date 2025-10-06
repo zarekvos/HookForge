@@ -1,11 +1,5 @@
 ﻿{
-  "builds": [
-    {
-      "src": "ui/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ]
+  "buildCommand": "cd ui && npm install && npm run build",
+  "outputDirectory": "ui/dist",
+  "installCommand": "echo 'Skipping root install'"
 }
