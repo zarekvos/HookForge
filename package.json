@@ -3,9 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build": "npm run build --prefix ui",
-    "dev": "npm run dev --prefix ui",
-    "preview": "npm run preview --prefix ui",
-    "install-ui": "npm install --prefix ui"
+    "build": "npm install --prefix ui && npm run build --prefix ui",
+    "dev": "npm install --prefix ui && npm run dev --prefix ui",
+    "preview": "npm install --prefix ui && npm run preview --prefix ui",
+    "install-ui": "npm install --prefix ui",
+    "build-only": "npm run build --prefix ui"
   }
 }
