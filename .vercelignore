@@ -1,0 +1,8 @@
+# Ignore root files, focus on ui directory
+/src/
+/target/
+/Cargo.*
+/README.md
+/rustup-init.exe
+/*.json
+/*.html
